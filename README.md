@@ -20,3 +20,25 @@ https://github.com/Ermanas/pf_pgv100
       id_path: "pci-0000:00:14.0-usb-0:4:1.0" # ID Path to detect tty (PGV100 udevadm info)
       timeout: 1000 # Timeout to open serial port (ms)
 ```
+
+### To build pgv100-ros2 package
+```
+cd ~ros2_ws/src && git clone https://github.com/furkansariyildiz/pgv100-ros2.git
+```
+
+```bash
+cd ~ros2_ws && colcon build --symlink-install --packages-select pgv100
+```
+
+### To run via ros2 run command
+```bash
+cd ~ros2_ws && source install/setup.bash
+ros2 run pgv100 pgv-100
+```
+
+### To run via ros2 launch command (with config.yaml)
+```bash
+cd ~ros2_ws && source install/setup.bash
+ros2 launch pgv100 pgv-100.launch.py
+```
+
