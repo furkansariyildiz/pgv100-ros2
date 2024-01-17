@@ -1,0 +1,9 @@
+std_msgs/Header header
+float32 x_position
+float32 y_position
+float32 angle
+string direction
+uint8 color_lane_count
+uint8 no_color_lane
+uint8 no_position
+uint8 tag_detected
