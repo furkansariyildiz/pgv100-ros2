@@ -9,7 +9,7 @@ endif()
 find_package(ament_cmake REQUIRED)
 find_package(rclcpp REQUIRED)
 find_package(serial REQUIRED)
-find_package(pgv100 REQUIRED)
+# find_package(pgv100 REQUIRED)
 find_package(builtin_interfaces REQUIRED)
 find_package(std_msgs REQUIRED)
 find_package(rosidl_default_generators REQUIRED)
@@ -22,9 +22,11 @@ rosidl_generate_interfaces(${PROJECT_NAME}
   DEPENDENCIES builtin_interfaces std_msgs
 )
 
+
+
 add_executable(pgv-100 src/pgv-100.cpp)
 target_link_libraries(pgv-100 ${catkin_LIBRARIES})
-ament_target_dependencies(pgv-100 rclcpp std_msgs serial pgv100)
+ament_target_dependencies(pgv-100 rclcpp std_msgs serial)
 
 install(TARGETS
         pgv-100
@@ -36,6 +38,9 @@ install(DIRECTORY
         config
         DESTINATION share/${PROJECT_NAME}/
 )
+
+rosidl_get_typesupport_target(cpp_typesupport_target ${PROJECT_NAME} "rosidl_typesupport_cpp")
+target_link_libraries(pgv-100 "${cpp_typesupport_target}")
 
 ament_export_dependencies(rosidl_default_runtime)
 ament_package()
