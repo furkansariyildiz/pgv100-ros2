@@ -14,7 +14,7 @@ https://github.com/Ermanas/pf_pgv100
       port_name: "/dev/ttyACM0" # Port name of left motor controller serial port.
       baudrate: 115200 # Baudrate of the PGV100 serial port. 
       serial_port_group: "/dev" # Serial port group to detect tty
-      id_vendor: "Roboteq" # ID Vendor to detect tty (PGV100 udevadm info)
+      id_vendor: "PGV" # ID Vendor to detect tty (PGV100 udevadm info)
       id_vendor_id: "20d2" # ID Vendor ID to detect tty (PGV100 udevadm info)
       id_model_id: "5740" # ID Model ID to detect tty (PGV100 udevadm info)
       id_path: "pci-0000:00:14.0-usb-0:4:1.0" # ID Path to detect tty (PGV100 udevadm info)
