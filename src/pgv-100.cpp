@@ -42,7 +42,7 @@ Node("pgv100_node")
 
     _pgv_baudrate = this->settingBaudrate(_pgv_baudrate);
 
-    _pgv_serial_port = open(_pgv_serial_port_name.c_str(), O_RDWR | O_NOCTTY | O_NDELAY);    
+    _pgv_serial_port = open(_pgv_serial_port_name.c_str(), O_RDWR);    
 
     rclcpp::sleep_for(chrono::milliseconds(_timeout));
 
@@ -153,18 +153,30 @@ void PGV100::prepareTermios(termios* tty, int serial_port, int baudrate)
     cfsetospeed(tty, (speed_t)baudrate);
     cfsetispeed(tty, (speed_t)baudrate);
 
-    tty->c_cflag     &=  ~PARENB;            
-    tty->c_cflag     &=  ~CSTOPB;
-    tty->c_cflag     &=  ~CSIZE;
-    tty->c_cflag     |=  CS8;
+    tty->c_cflag |= PARENB;  // Set parity bit, enabling parity
+    tty->c_cflag &= ~CSTOPB; // Clear stop field, only one stop bit used in communication (most common)
+    tty->c_cflag |= CS7; // 8 bits per byte (most common)
+    tty->c_cflag &= ~CRTSCTS; // Disable RTS/CTS hardware flow control (most common)
+    tty->c_cflag |= CREAD | CLOCAL; // Turn on READ & ignore ctrl lines (CLOCAL = 1)
+    tty->c_lflag &= ~ICANON;
+    tty->c_lflag &= ~ECHO; // Disable echo
+    tty->c_lflag &= ~ECHOE; // Disable erasure
+    tty->c_lflag &= ~ECHONL; // Disable new-line echo
+    tty->c_lflag &= ~ISIG; // Disable interpretation of INTR, QUIT and SUSP
+    tty->c_iflag &= ~(IXON | IXOFF | IXANY); // Turn off s/w flow ctrl
+    tty->c_iflag &= ~(IGNBRK|BRKINT|PARMRK|ISTRIP|INLCR|IGNCR|ICRNL); // Disable any special handling of received bytes
+    tty->c_oflag &= ~OPOST; // Prevent special interpretation of output bytes (e.g. newline chars)
+    tty->c_oflag &= ~ONLCR; // Prevent conversion of newline to carriage return/line feed
+    // tty.c_oflag &= ~OXTABS; // Prevent conversion of tabs to spaces (NOT PRESENT IN LINUX)
+    // tty.c_oflag &= ~ONOEOT; // Prevent removal of C-d chars (0x004) in output (NOT PRESENT IN LINUX)
+    tty->c_cc[VTIME] = 0;    // Wait for up to 1s (10 deciseconds), returning as soon as any data is received.
+    tty->c_cc[VMIN] = 2;  
 
-    tty->c_cflag     &=  ~CRTSCTS;           
-    tty->c_cc[VMIN]   =  1;                 
-    tty->c_cc[VTIME]  =  5;                  
-    tty->c_cflag     |=  CREAD | CLOCAL;     
+    cfsetospeed(tty, baudrate);
+    cfsetispeed(tty, baudrate);
 
-    cfmakeraw(tty);
-    tcflush(serial_port, TCIFLUSH);
+    // cfmakeraw(tty);
+    // tcflush(serial_port, TCIFLUSH);
 
     if(tcsetattr(serial_port, TCSANOW, tty) != 0)
     {
@@ -258,6 +270,7 @@ void PGV100::mainLoop(void)
         _robot_y_position_decimal = _robot_y_position_decimal * -1;
     }
 
+    _pgv_scan_message.header.stamp = get_clock()->now();
     _pgv_scan_message.angle = _robot_angle_decimal - _calibration_error_angle; // degree
     _pgv_scan_message.x_position = (_robot_x_position_decimal - _calibration_error_x) / 10.0; // mm
     _pgv_scan_message.y_position = (_robot_y_position_decimal - _calibration_error_y) / 10.0; // mm

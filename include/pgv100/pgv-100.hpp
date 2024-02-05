@@ -36,7 +36,6 @@
 #include <sys/types.h>
 #include <sys/socket.h>
 #include <sys/ioctl.h>
-#include <serial/serial.h>
 
 using namespace std;
 
@@ -103,7 +102,7 @@ class PGV100: public rclcpp::Node
 
         int _timeout;
 
-        int _pgv_serial_buffer[256];
+        char _pgv_serial_buffer[21];
 
         int _pgv_readed_byte = 0;
 
