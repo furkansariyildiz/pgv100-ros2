@@ -8,8 +8,6 @@ endif()
 # find dependencies
 find_package(ament_cmake REQUIRED)
 find_package(rclcpp REQUIRED)
-find_package(serial REQUIRED)
-# find_package(pgv100 REQUIRED)
 find_package(builtin_interfaces REQUIRED)
 find_package(std_msgs REQUIRED)
 find_package(rosidl_default_generators REQUIRED)
@@ -26,7 +24,7 @@ rosidl_generate_interfaces(${PROJECT_NAME}
 
 add_executable(pgv-100 src/pgv-100.cpp)
 target_link_libraries(pgv-100 ${catkin_LIBRARIES})
-ament_target_dependencies(pgv-100 rclcpp std_msgs serial)
+ament_target_dependencies(pgv-100 rclcpp std_msgs)
 
 install(TARGETS
         pgv-100
